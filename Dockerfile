@@ -1,8 +1,8 @@
 FROM ghcr.io/ente-io/server:latest
 
-# Instalar gettext para envsubst
+# Instalar gettext para envsubst (Alpine Linux)
 USER root
-RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache gettext
 
 # Copiar o script de entrypoint
 COPY entrypoint.sh /entrypoint.sh
