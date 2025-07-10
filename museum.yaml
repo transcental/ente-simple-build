@@ -1,0 +1,24 @@
+# Configuração básica do Ente Museum
+# Para mais opções, veja: https://github.com/ente-io/ente/blob/main/server/configurations/local.yaml
+
+# Configurações de logging
+log:
+  level: info
+
+# Configurações de rate limiting
+rate_limit:
+  enabled: true
+  max_requests: 100
+  window_seconds: 60
+
+# Configurações de upload
+upload:
+  max_file_size: 100MB
+  allowed_types: ["image/jpeg", "image/png", "image/gif", "video/mp4"]
+
+# Configurações de servidor
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: 30s
+  write_timeout: 30s
