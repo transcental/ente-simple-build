@@ -1,0 +1,3 @@
+CREATE USER ente_user WITH PASSWORD 'TestPassword123!';
+CREATE DATABASE ente_db;
+GRANT ALL PRIVILEGES ON DATABASE ente_db TO ente_user;
