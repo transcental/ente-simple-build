@@ -39,8 +39,8 @@ services:
       - "3200:3200"
       - "3201:3201"
     environment:
-      MINIO_ROOT_USER: changeme
-      MINIO_ROOT_PASSWORD: changeme1234
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       COOLIFY_URL: ${COOLIFY_URL:-}
       COOLIFY_FQDN: ${COOLIFY_FQDN:-}
     command: server /data --address ":3200" --console-address ":3201"
@@ -65,21 +65,21 @@ configs:
       s3:
           are_local_buckets: true
           b2-eu-cen:
-              key: changeme
-              secret: changeme1234
+              key: ${MINIO_ROOT_USER}
+              secret: ${MINIO_ROOT_PASSWORD}
               endpoint: minio:3200
               region: eu-central-2
               bucket: b2-eu-cen
           wasabi-eu-central-2-v3:
-              key: changeme
-              secret: changeme1234
+              key: ${MINIO_ROOT_USER}
+              secret: ${MINIO_ROOT_PASSWORD}
               endpoint: minio:3200
               region: eu-central-2
               bucket: wasabi-eu-central-2-v3
               compliance: false
           scw-eu-fr-v3:
-              key: changeme
-              secret: changeme1234
+              key: ${MINIO_ROOT_USER}
+              secret: ${MINIO_ROOT_PASSWORD}
               endpoint: minio:3200
               region: eu-central-2
               bucket: scw-eu-fr-v3
