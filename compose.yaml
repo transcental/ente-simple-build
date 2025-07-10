@@ -41,10 +41,35 @@ services:
     environment:
       MINIO_ROOT_USER: changeme
       MINIO_ROOT_PASSWORD: changeme1234
+      COOLIFY_URL: ${COOLIFY_URL:-}
+      COOLIFY_FQDN: ${COOLIFY_FQDN:-}
     command: server /data --address ":3200" --console-address ":3201"
     volumes:
       - minio-data:/data
     restart: unless-stopped
+    labels:
+      # Labels para o Coolify detectar o serviço
+      - "coolify.managed=true"
+      - "coolify.type=application"
+      
+      # Labels do Caddy para SSL automático usando variáveis
+      - "caddy_0=${COOLIFY_URL:-https://minio.localhost}"
+      - "caddy_0.reverse_proxy={{upstreams 3201}}"
+      - "caddy_0.header=-Server"
+      - "caddy_0.encode=zstd gzip"
+      
+      # Labels do Traefik (caso o Coolify use ambos)
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.minio-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.minio-gzip.compress=true"
+      - "traefik.http.routers.minio-http.rule=Host(`${COOLIFY_FQDN:-minio.localhost}`)"
+      - "traefik.http.routers.minio-http.entrypoints=web"
+      - "traefik.http.routers.minio-http.middlewares=minio-redirect"
+      - "traefik.http.routers.minio-https.rule=Host(`${COOLIFY_FQDN:-minio.localhost}`)"
+      - "traefik.http.routers.minio-https.entrypoints=websecure"
+      - "traefik.http.routers.minio-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.minio-https.middlewares=minio-gzip"
+      - "traefik.http.services.minio.loadbalancer.server.port=3201"
 
 configs:
   credentials_yaml:
