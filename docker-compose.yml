@@ -11,28 +11,44 @@ services:
       - SERVICE_FQDN_MUSEUM_8080
       - ENVIRONMENT=production
       - ENTE_CREDENTIALS_FILE=/credentials.yaml
-      # Database configuration
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=${POSTGRES_DB:-ente}
-      - DB_USER=$SERVICE_USER_POSTGRES
-      - DB_PASSWORD=$SERVICE_PASSWORD_POSTGRES
-      - DB_SSLMODE=disable
-      # S3/MinIO configuration
-      - S3_ACCESS_KEY=$SERVICE_USER_MINIO
-      - S3_SECRET_KEY=$SERVICE_PASSWORD_MINIO
-      - S3_ENDPOINT=localhost:3200
-      - S3_REGION=eu-central-2
-      # Security keys
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-      - HASH_KEY=${HASH_KEY}
-      - JWT_SECRET=${JWT_SECRET}
-      # App URLs
-      - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM}
-      - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
-      - ENTE_ACCOUNTS_ORIGIN=${SERVICE_FQDN_WEB_3001}
-      - ENTE_FAMILY_ORIGIN=${SERVICE_FQDN_WEB_3000}
-      - ENTE_CAST_ORIGIN=${SERVICE_FQDN_WEB_3004}
+      # Database configuration with ENTE_ prefix
+      - ENTE_DB_HOST=postgres
+      - ENTE_DB_PORT=5432
+      - ENTE_DB_NAME=${POSTGRES_DB:-ente}
+      - ENTE_DB_USER=$SERVICE_USER_POSTGRES
+      - ENTE_DB_PASSWORD=$SERVICE_PASSWORD_POSTGRES
+      - ENTE_DB_SSLMODE=disable
+      # S3/MinIO configuration with ENTE_ prefix
+      - ENTE_S3_ARE_LOCAL_BUCKETS=true
+      - ENTE_S3_USE_PATH_STYLE_URLS=true
+      - ENTE_S3_B2_EU_CEN_KEY=$SERVICE_USER_MINIO
+      - ENTE_S3_B2_EU_CEN_SECRET=$SERVICE_PASSWORD_MINIO
+      - ENTE_S3_B2_EU_CEN_ENDPOINT=localhost:3200
+      - ENTE_S3_B2_EU_CEN_REGION=eu-central-2
+      - ENTE_S3_B2_EU_CEN_BUCKET=b2-eu-cen
+      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_KEY=$SERVICE_USER_MINIO
+      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_SECRET=$SERVICE_PASSWORD_MINIO
+      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_ENDPOINT=localhost:3200
+      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_REGION=eu-central-2
+      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_BUCKET=wasabi-eu-central-2-v3
+      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_COMPLIANCE=false
+      - ENTE_S3_SCW_EU_FR_V3_KEY=$SERVICE_USER_MINIO
+      - ENTE_S3_SCW_EU_FR_V3_SECRET=$SERVICE_PASSWORD_MINIO
+      - ENTE_S3_SCW_EU_FR_V3_ENDPOINT=localhost:3200
+      - ENTE_S3_SCW_EU_FR_V3_REGION=eu-central-2
+      - ENTE_S3_SCW_EU_FR_V3_BUCKET=scw-eu-fr-v3
+      # Security keys with ENTE_ prefix
+      - ENTE_KEY_ENCRYPTION=${ENCRYPTION_KEY}
+      - ENTE_KEY_HASH=${HASH_KEY}
+      - ENTE_JWT_SECRET=${JWT_SECRET}
+      # App URLs with ENTE_ prefix
+      - ENTE_APPS_PUBLIC_ALBUMS=${SERVICE_FQDN_WEB_3002}
+      - ENTE_APPS_CAST=${SERVICE_FQDN_WEB_3004}
+      - ENTE_APPS_ACCOUNTS=${SERVICE_FQDN_WEB_3001}
+      - ENTE_APPS_FAMILY=${SERVICE_FQDN_WEB_3000}
+      # WebAuthn configuration
+      - ENTE_WEBAUTHN_RPID=vm.lucasdesenv.com
+      - ENTE_WEBAUTHN_RPORIGINS=${SERVICE_FQDN_WEB_3000}
     volumes:
       - ./museum.yaml:/museum.yaml:ro
       - ./credentials.yaml:/credentials.yaml:ro
