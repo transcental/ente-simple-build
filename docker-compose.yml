@@ -20,8 +20,6 @@ services:
     volumes:
       - ./museum.yaml:/museum.yaml:ro
       - ./data:/data:ro
-    networks:
-      - ente-network
 
   # Resolve "localhost:3200" in the museum container to the minio container
   socat:
@@ -38,8 +36,6 @@ services:
       - SERVICE_FQDN_WEB_3002
       - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM}
       - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
-    networks:
-      - ente-network
 
   postgres:
     image: postgres:15
@@ -55,8 +51,6 @@ services:
       retries: 5
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    networks:
-      - ente-network
 
   minio:
     image: minio/minio:latest
@@ -73,8 +67,6 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-    networks:
-      - ente-network
 
   # MinIO bucket setup
   minio-setup:
@@ -99,13 +91,8 @@ services:
       /usr/bin/mc anonymous set none minio-local/scw-eu-fr-v3
       echo 'Buckets created and configured successfully'
       "
-    networks:
-      - ente-network
 
 volumes:
   postgres-data:
   minio-data:
 
-networks:
-  ente-network:
-    driver: bridge
