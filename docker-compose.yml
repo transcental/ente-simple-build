@@ -9,59 +9,12 @@ services:
     image: ghcr.io/ente-io/server:latest
     environment:
       - SERVICE_FQDN_MUSEUM_8080
-      - ENVIRONMENT=production
-      - ENTE_CREDENTIALS_FILE=/credentials.yaml
-      # Database configuration with ENTE_ prefix
-      - ENTE_DB_HOST=postgres
-      - ENTE_DB_PORT=5432
-      - ENTE_DB_NAME=${POSTGRES_DB:-ente}
-      - ENTE_DB_USER=$SERVICE_USER_POSTGRES
-      - ENTE_DB_PASSWORD=$SERVICE_PASSWORD_POSTGRES
-      - ENTE_DB_SSLMODE=disable
-      # S3/MinIO configuration with ENTE_ prefix
-      - ENTE_S3_ARE_LOCAL_BUCKETS=true
-      - ENTE_S3_USE_PATH_STYLE_URLS=true
-      - ENTE_S3_B2_EU_CEN_KEY=$SERVICE_USER_MINIO
-      - ENTE_S3_B2_EU_CEN_SECRET=$SERVICE_PASSWORD_MINIO
-      - ENTE_S3_B2_EU_CEN_ENDPOINT=localhost:3200
-      - ENTE_S3_B2_EU_CEN_REGION=eu-central-2
-      - ENTE_S3_B2_EU_CEN_BUCKET=b2-eu-cen
-      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_KEY=$SERVICE_USER_MINIO
-      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_SECRET=$SERVICE_PASSWORD_MINIO
-      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_ENDPOINT=localhost:3200
-      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_REGION=eu-central-2
-      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_BUCKET=wasabi-eu-central-2-v3
-      - ENTE_S3_WASABI_EU_CENTRAL_2_V3_COMPLIANCE=false
-      - ENTE_S3_SCW_EU_FR_V3_KEY=$SERVICE_USER_MINIO
-      - ENTE_S3_SCW_EU_FR_V3_SECRET=$SERVICE_PASSWORD_MINIO
-      - ENTE_S3_SCW_EU_FR_V3_ENDPOINT=localhost:3200
-      - ENTE_S3_SCW_EU_FR_V3_REGION=eu-central-2
-      - ENTE_S3_SCW_EU_FR_V3_BUCKET=scw-eu-fr-v3
-      # Security keys with ENTE_ prefix
-      - ENTE_KEY_ENCRYPTION=${ENCRYPTION_KEY}
-      - ENTE_KEY_HASH=${HASH_KEY}
-      - ENTE_JWT_SECRET=${JWT_SECRET}
-      # App URLs with ENTE_ prefix
-      - ENTE_APPS_PUBLIC_ALBUMS=${SERVICE_FQDN_WEB_3002}
-      - ENTE_APPS_CAST=${SERVICE_FQDN_WEB_3004}
-      - ENTE_APPS_ACCOUNTS=${SERVICE_FQDN_WEB_3001}
-      - ENTE_APPS_FAMILY=${SERVICE_FQDN_WEB_3000}
-      # WebAuthn configuration
-      - ENTE_WEBAUTHN_RPID=vm.lucasdesenv.com
-      - ENTE_WEBAUTHN_RPORIGINS=${SERVICE_FQDN_WEB_3000}
-    volumes:
-      - ./museum.yaml:/museum.yaml:ro
-      - ./credentials.yaml:/credentials.yaml:ro
-      - ./data:/data
-      - museum-logs:/var/logs
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    volumes:
+      - ./museum.yaml:/museum.yaml:ro
+      - ./data:/data:ro
 
   # Resolve "localhost:3200" in the museum container to the minio container
   socat:
@@ -75,23 +28,16 @@ services:
     image: ghcr.io/ente-io/web:latest
     environment:
       - SERVICE_FQDN_WEB_3000
-      - SERVICE_FQDN_WEB_3001
       - SERVICE_FQDN_WEB_3002
-      - SERVICE_FQDN_WEB_3003
-      - SERVICE_FQDN_WEB_3004
       - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM}
       - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
-      - ENTE_ACCOUNTS_ORIGIN=${SERVICE_FQDN_WEB_3001}
-      - ENTE_FAMILY_ORIGIN=${SERVICE_FQDN_WEB_3000}
-      - ENTE_CAST_ORIGIN=${SERVICE_FQDN_WEB_3004}
 
   postgres:
     image: postgres:15
     environment:
-      - POSTGRES_USER=$SERVICE_USER_POSTGRES
-      - POSTGRES_PASSWORD=$SERVICE_PASSWORD_POSTGRES
-      - POSTGRES_DB=${POSTGRES_DB:-ente}
-      - POSTGRES_INITDB_ARGS="--auth-host=md5"
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES:-pguser}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES:-2DTjzzKrLl4xpB8n6rpcScG1YflL}
+      - POSTGRES_DB=${POSTGRES_DB:-ente_db}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -q -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       start_period: 40s
@@ -100,34 +46,13 @@ services:
       retries: 5
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    command: >
-      postgres
-      -c shared_preload_libraries=pg_stat_statements
-      -c pg_stat_statements.max=10000
-      -c pg_stat_statements.track=all
-      -c max_connections=200
-      -c shared_buffers=256MB
-      -c effective_cache_size=1GB
-      -c maintenance_work_mem=64MB
-      -c checkpoint_completion_target=0.9
-      -c wal_buffers=16MB
-      -c default_statistics_target=100
-      -c random_page_cost=1.1
-      -c effective_io_concurrency=200
-      -c work_mem=4MB
-      -c min_wal_size=1GB
-      -c max_wal_size=4GB
-      -c max_worker_processes=8
-      -c max_parallel_workers_per_gather=4
-      -c max_parallel_workers=8
-      -c max_parallel_maintenance_workers=4
 
   minio:
     image: minio/minio:latest
     environment:
       - SERVICE_FQDN_MINIO_3201
-      - MINIO_ROOT_USER=$SERVICE_USER_MINIO
-      - MINIO_ROOT_PASSWORD=$SERVICE_PASSWORD_MINIO
+      - MINIO_ROOT_USER=${SERVICE_USER_MINIO:-minio-user-X569veZN}
+      - MINIO_ROOT_PASSWORD=${SERVICE_PASSWORD_MINIO:-pMpc3+De6+/bFADNOQ/KnG43eYdf}
       - MINIO_BROWSER_REDIRECT_URL=${SERVICE_FQDN_MINIO_3201}
     command: server /data --address ":3200" --console-address ":3201"
     volumes:
@@ -147,7 +72,7 @@ services:
         condition: service_healthy
     entrypoint: |
       /bin/sh -c "
-      until /usr/bin/mc alias set minio-local http://minio:3200 \$${SERVICE_USER_MINIO} \$${SERVICE_PASSWORD_MINIO}; do
+      until /usr/bin/mc alias set minio-local http://minio:3200 \$${SERVICE_USER_MINIO:-minio-user-X569veZN} \$${SERVICE_PASSWORD_MINIO:-pMpc3+De6+/bFADNOQ/KnG43eYdf}; do
         echo 'Waiting for MinIO...'
         sleep 5
       done
@@ -165,4 +90,3 @@ services:
 volumes:
   postgres-data:
   minio-data:
-  museum-logs:
