@@ -11,19 +11,19 @@ http:
 
 # App base endpoints - these will be set via environment variables in Coolify
 apps:
-  public-albums: ${ENTE_ALBUMS_ORIGIN}
-  cast: ${ENTE_CAST_ORIGIN}
-  accounts: ${ENTE_ACCOUNTS_ORIGIN}
-  family: ${ENTE_FAMILY_ORIGIN}
+  public-albums: https://enteapp.vm.lucasdesenv.com
+  cast: https://enteapp.vm.lucasdesenv.com
+  accounts: https://enteapp.vm.lucasdesenv.com
+  family: https://enteapp.vm.lucasdesenv.com
 
 # Database configuration - credentials loaded from credentials.yaml
 db:
   host: postgres
   port: 5432
-  name: ${POSTGRES_DB}
+  name: ente_db
   sslmode: disable
-  user: ${POSTGRES_USER}
-  password: ${POSTGRES_PASSWORD}
+  user: pguser
+  password: ""
 
 # S3 Configuration for local MinIO
 s3:
@@ -40,41 +40,41 @@ s3:
   
   # Bucket configurations
   b2-eu-cen:
-    key: ${MINIO_ROOT_USER}
-    secret: ${MINIO_ROOT_PASSWORD}
+    key: ""
+    secret: ""
     endpoint: localhost:3200
     region: eu-central-2
     bucket: b2-eu-cen
   
   wasabi-eu-central-2-v3:
-    key: ${MINIO_ROOT_USER}
-    secret: ${MINIO_ROOT_PASSWORD}
+    key: ""
+    secret: ""
     endpoint: localhost:3200
     region: eu-central-2
     bucket: wasabi-eu-central-2-v3
     compliance: false
   
   scw-eu-fr-v3:
-    key: ${MINIO_ROOT_USER}
-    secret: ${MINIO_ROOT_PASSWORD}
+    key: ""
+    secret: ""
     endpoint: localhost:3200
     region: eu-central-2
     bucket: scw-eu-fr-v3
 
 # Encryption keys - will be generated and stored in credentials.yaml
 key:
-  encryption: ${MUSEUM_ENCRYPTION_KEY}
-  hash: ${MUSEUM_HASH_KEY}
+  encryption: ""
+  hash: ""
 
 # JWT configuration
 jwt:
-  secret: ${MUSEUM_JWT_SECRET}
+  secret: ""
 
 # WebAuthn configuration for 2FA (optional)
 webauthn:
-  rpid: ${WEBAUTHN_RPID}
+  rpid: vm.lucasdesenv.com
   rporigins:
-    - ${ENTE_ACCOUNTS_ORIGIN}
+    - https://enteapp.vm.lucasdesenv.com
 
 # Internal configuration
 internal:
