@@ -11,19 +11,19 @@ http:
 
 # App base endpoints - these will be set via environment variables in Coolify
 apps:
-  public-albums: https://enteapp.vm.lucasdesenv.com
-  cast: https://enteapp.vm.lucasdesenv.com
-  accounts: https://enteapp.vm.lucasdesenv.com
-  family: https://enteapp.vm.lucasdesenv.com
+  public-albums: ${SERVICE_FQDN_WEB_3002}
+  cast: ${SERVICE_FQDN_WEB_3004}
+  accounts: ${SERVICE_FQDN_WEB_3001}
+  family: ${SERVICE_FQDN_WEB_3000}
 
 # Database configuration - credentials loaded from environment variables
 db:
-  host: ${DB_HOST:-postgres}
-  port: ${DB_PORT:-5432}
-  name: ${DB_NAME:-ente_db}
-  sslmode: ${DB_SSLMODE:-disable}
-  user: ${DB_USER:-pguser}
-  password: ${DB_PASSWORD}
+  host: postgres
+  port: 5432
+  name: ${POSTGRES_DB:-ente}
+  sslmode: disable
+  user: $SERVICE_USER_POSTGRES
+  password: $SERVICE_PASSWORD_POSTGRES
 
 # S3 Configuration for local MinIO
 s3:
@@ -40,25 +40,25 @@ s3:
   
   # Bucket configurations
   b2-eu-cen:
-    key: ${S3_ACCESS_KEY}
-    secret: ${S3_SECRET_KEY}
-    endpoint: ${S3_ENDPOINT:-localhost:3200}
-    region: ${S3_REGION:-eu-central-2}
+    key: $SERVICE_USER_MINIO
+    secret: $SERVICE_PASSWORD_MINIO
+    endpoint: localhost:3200
+    region: eu-central-2
     bucket: b2-eu-cen
   
   wasabi-eu-central-2-v3:
-    key: ${S3_ACCESS_KEY}
-    secret: ${S3_SECRET_KEY}
-    endpoint: ${S3_ENDPOINT:-localhost:3200}
-    region: ${S3_REGION:-eu-central-2}
+    key: $SERVICE_USER_MINIO
+    secret: $SERVICE_PASSWORD_MINIO
+    endpoint: localhost:3200
+    region: eu-central-2
     bucket: wasabi-eu-central-2-v3
     compliance: false
   
   scw-eu-fr-v3:
-    key: ${S3_ACCESS_KEY}
-    secret: ${S3_SECRET_KEY}
-    endpoint: ${S3_ENDPOINT:-localhost:3200}
-    region: ${S3_REGION:-eu-central-2}
+    key: $SERVICE_USER_MINIO
+    secret: $SERVICE_PASSWORD_MINIO
+    endpoint: localhost:3200
+    region: eu-central-2
     bucket: scw-eu-fr-v3
 
 # Encryption keys - loaded from environment variables
@@ -74,7 +74,7 @@ jwt:
 webauthn:
   rpid: vm.lucasdesenv.com
   rporigins:
-    - https://enteapp.vm.lucasdesenv.com
+    - ${SERVICE_FQDN_WEB_3000}
 
 # Internal configuration
 internal:
