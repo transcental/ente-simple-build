@@ -9,21 +9,21 @@ http:
   # TLS will be handled by the reverse proxy (Coolify/Traefik)
   use-tls: false
 
-# App base endpoints - these will be set via environment variables in Coolify
+# App base endpoints - configured via environment variables
 apps:
-  public-albums: ${SERVICE_FQDN_WEB_3002}
-  cast: ${SERVICE_FQDN_WEB_3004}
-  accounts: ${SERVICE_FQDN_WEB_3001}
-  family: ${SERVICE_FQDN_WEB_3000}
+  public-albums: https://albums.vm.lucasdesenv.com
+  cast: https://cast.vm.lucasdesenv.com
+  accounts: https://accounts.vm.lucasdesenv.com
+  family: https://app.vm.lucasdesenv.com
 
-# Database configuration - credentials loaded from environment variables
+# Database configuration - will be overridden by environment variables
 db:
   host: postgres
   port: 5432
-  name: ${POSTGRES_DB:-ente}
+  name: ente
   sslmode: disable
-  user: $SERVICE_USER_POSTGRES
-  password: $SERVICE_PASSWORD_POSTGRES
+  user: postgres
+  password: postgres
 
 # S3 Configuration for local MinIO
 s3:
@@ -40,41 +40,41 @@ s3:
   
   # Bucket configurations
   b2-eu-cen:
-    key: $SERVICE_USER_MINIO
-    secret: $SERVICE_PASSWORD_MINIO
+    key: minioadmin
+    secret: minioadmin
     endpoint: localhost:3200
     region: eu-central-2
     bucket: b2-eu-cen
   
   wasabi-eu-central-2-v3:
-    key: $SERVICE_USER_MINIO
-    secret: $SERVICE_PASSWORD_MINIO
+    key: minioadmin
+    secret: minioadmin
     endpoint: localhost:3200
     region: eu-central-2
     bucket: wasabi-eu-central-2-v3
     compliance: false
   
   scw-eu-fr-v3:
-    key: $SERVICE_USER_MINIO
-    secret: $SERVICE_PASSWORD_MINIO
+    key: minioadmin
+    secret: minioadmin
     endpoint: localhost:3200
     region: eu-central-2
     bucket: scw-eu-fr-v3
 
-# Encryption keys - loaded from environment variables
+# Encryption keys - will be overridden by environment variables
 key:
-  encryption: ${ENCRYPTION_KEY}
-  hash: ${HASH_KEY}
+  encryption: placeholder_encryption_key_32char
+  hash: placeholder_hash_key_32char_here
 
 # JWT configuration
 jwt:
-  secret: ${JWT_SECRET}
+  secret: placeholder_jwt_secret_key_32char
 
 # WebAuthn configuration for 2FA (optional)
 webauthn:
   rpid: vm.lucasdesenv.com
   rporigins:
-    - ${SERVICE_FQDN_WEB_3000}
+    - https://app.vm.lucasdesenv.com
 
 # Internal configuration
 internal:

@@ -11,6 +11,28 @@ services:
       - SERVICE_FQDN_MUSEUM_8080
       - ENVIRONMENT=production
       - ENTE_CREDENTIALS_FILE=/credentials.yaml
+      # Database configuration
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB:-ente}
+      - DB_USER=$SERVICE_USER_POSTGRES
+      - DB_PASSWORD=$SERVICE_PASSWORD_POSTGRES
+      - DB_SSLMODE=disable
+      # S3/MinIO configuration
+      - S3_ACCESS_KEY=$SERVICE_USER_MINIO
+      - S3_SECRET_KEY=$SERVICE_PASSWORD_MINIO
+      - S3_ENDPOINT=localhost:3200
+      - S3_REGION=eu-central-2
+      # Security keys
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - HASH_KEY=${HASH_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      # App URLs
+      - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM}
+      - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
+      - ENTE_ACCOUNTS_ORIGIN=${SERVICE_FQDN_WEB_3001}
+      - ENTE_FAMILY_ORIGIN=${SERVICE_FQDN_WEB_3000}
+      - ENTE_CAST_ORIGIN=${SERVICE_FQDN_WEB_3004}
     volumes:
       - ./museum.yaml:/museum.yaml:ro
       - ./credentials.yaml:/credentials.yaml:ro

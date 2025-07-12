@@ -37,3 +37,8 @@ JWT_SECRET=your_jwt_secret_key_here_minimum_32_characters_long
 # - Web Auth: auth.vm.lucasdesenv.com (port 3003)
 # - Web Cast: cast.vm.lucasdesenv.com (port 3004)
 # - MinIO Console: minio.vm.lucasdesenv.com (port 3201)
+
+# IMPORTANT: The configuration files (museum.yaml and credentials.yaml) contain
+# placeholder values that will be overridden by the environment variables above.
+# The museum service will use the environment variables for the actual database
+# and S3 connection details.
