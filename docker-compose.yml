@@ -96,3 +96,7 @@ volumes:
   postgres-data:
   minio-data:
 
+networks:
+  default:
+    driver: bridge
+
