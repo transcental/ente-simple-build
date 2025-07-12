@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  museum:
+    image: ghcr.io/ente-io/server:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=production
+      - ENTE_CREDENTIALS_FILE=/credentials.yaml
+    volumes:
+      - ./museum.yaml:/museum.yaml:ro
+      - ./credentials.yaml:/credentials.yaml:ro
+      - ./data:/data
+      - museum-logs:/var/logs
+    networks:
+      - ente-network
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Resolve "localhost:3200" in the museum container to the minio container
+  socat:
+    image: alpine/socat:latest
+    restart: unless-stopped
+    network_mode: service:museum
+    depends_on: 
+      - museum
+    command: "TCP-LISTEN:3200,fork,reuseaddr TCP:minio:3200"
+
+  web:
+    image: ghcr.io/ente-io/web:latest
+    restart: unless-stopped
+    environment:
+      - ENTE_API_ORIGIN=${ENTE_API_ORIGIN}
+      - ENTE_ALBUMS_ORIGIN=${ENTE_ALBUMS_ORIGIN}
+      - ENTE_ACCOUNTS_ORIGIN=${ENTE_ACCOUNTS_ORIGIN}
+      - ENTE_FAMILY_ORIGIN=${ENTE_FAMILY_ORIGIN}
+      - ENTE_CAST_ORIGIN=${ENTE_CAST_ORIGIN}
+    networks:
+      - ente-network
+    ports:
+      - "3000:3000"  # Photos web app
+      - "3001:3001"  # Accounts
+      - "3002:3002"  # Albums (public sharing)
+      - "3003:3003"  # Auth (2FA app)
+      - "3004:3004"  # Cast (slideshow)
+
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_INITDB_ARGS="--auth-host=md5"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
+      start_period: 40s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ente-network
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
+      -c pg_stat_statements.max=10000
+      -c pg_stat_statements.track=all
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_worker_processes=8
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_workers=8
+      -c max_parallel_maintenance_workers=4
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_BROWSER_REDIRECT_URL=${MINIO_BROWSER_REDIRECT_URL}
+    command: server /data --address ":3200" --console-address ":3201"
+    volumes:
+      - minio-data:/data
+    networks:
+      - ente-network
+    ports:
+      - "3200:3200"  # MinIO API
+      - "3201:3201"  # MinIO Console
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3200/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # MinIO bucket setup
+  minio-setup:
+    image: minio/mc:latest
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - ente-network
+    entrypoint: >
+      /bin/sh -c "
+      until /usr/bin/mc alias set minio-local http://minio:3200 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do
+        echo 'Waiting for MinIO...'
+        sleep 5
+      done
+      echo 'MinIO is ready. Creating buckets...'
+      /usr/bin/mc mb minio-local/b2-eu-cen --ignore-existing
+      /usr/bin/mc mb minio-local/wasabi-eu-central-2-v3 --ignore-existing
+      /usr/bin/mc mb minio-local/scw-eu-fr-v3 --ignore-existing
+      echo 'Setting bucket policies...'
+      /usr/bin/mc anonymous set none minio-local/b2-eu-cen
+      /usr/bin/mc anonymous set none minio-local/wasabi-eu-central-2-v3
+      /usr/bin/mc anonymous set none minio-local/scw-eu-fr-v3
+      echo 'Buckets created and configured successfully'
+      "
+
+volumes:
+  postgres-data:
+  minio-data:
+  museum-logs:
+
+networks:
+  ente-network:
+    driver: bridge
