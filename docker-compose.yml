@@ -2,13 +2,13 @@
 # slogan: Ente is a fully open source, End to End Encrypted alternative to Google Photos and Apple Photos
 # tags: ente,photos,backup,gallery,open,source,end-to-end,encryption
 # logo: https://github.com/ente-io/ente/raw/main/web/apps/photos/public/images/global/logo.png
-# port: 80
+# port: 8080
 
 services:
   museum:
     image: ghcr.io/ente-io/server:latest
     environment:
-      - SERVICE_FQDN_MUSEUM_80
+      - SERVICE_FQDN_MUSEUM_8080
       - ENTE_DB_HOST=postgres
       - ENTE_DB_PORT=5432
       - ENTE_DB_NAME=${POSTGRES_DB:-ente_db}
@@ -16,7 +16,7 @@ services:
       - ENTE_DB_PASSWORD=${SERVICE_PASSWORD_POSTGRES:-2DTjzzKrLl4xpB8n6rpcScG1YflL}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.museum.loadbalancer.server.port=80"
+      - "traefik.http.services.museum.loadbalancer.server.port=8080"
     depends_on:
       postgres:
         condition: service_healthy
