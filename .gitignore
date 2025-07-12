@@ -3,10 +3,12 @@
 docker-compose.override.yml
 .docker
 
-# Environment files
+# Environment files containing secrets
 .env
 .env.local
 .env.*.local
+.env.production
+.env.staging
 
 # Logs
 logs
@@ -44,3 +46,26 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+temp/
+tmp/
+
+# Security files and secrets
+*.key
+*.crt
+*.pem
+*.cert
+*.ca-bundle
+*.secret
+secrets/
+credentials/
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Build artifacts
+build/
+dist/
+*.tar.gz
+*.zip
