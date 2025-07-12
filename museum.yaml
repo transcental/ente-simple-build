@@ -23,7 +23,7 @@ db:
   name: ente_db
   sslmode: disable
   user: pguser
-  password: ""
+  password: EnteDB_SecurePass2024!
 
 # S3 Configuration for local MinIO
 s3:
@@ -40,23 +40,23 @@ s3:
   
   # Bucket configurations
   b2-eu-cen:
-    key: ""
-    secret: ""
+    key: enteminiouser
+    secret: EnteMinIO_SecurePass2024!
     endpoint: localhost:3200
     region: eu-central-2
     bucket: b2-eu-cen
   
   wasabi-eu-central-2-v3:
-    key: ""
-    secret: ""
+    key: enteminiouser
+    secret: EnteMinIO_SecurePass2024!
     endpoint: localhost:3200
     region: eu-central-2
     bucket: wasabi-eu-central-2-v3
     compliance: false
   
   scw-eu-fr-v3:
-    key: ""
-    secret: ""
+    key: enteminiouser
+    secret: EnteMinIO_SecurePass2024!
     endpoint: localhost:3200
     region: eu-central-2
     bucket: scw-eu-fr-v3
