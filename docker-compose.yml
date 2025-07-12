@@ -9,6 +9,11 @@ services:
     image: ghcr.io/ente-io/server:latest
     environment:
       - SERVICE_FQDN_MUSEUM_8080
+      - ENTE_DB_HOST=postgres
+      - ENTE_DB_PORT=5432
+      - ENTE_DB_NAME=ente_db
+      - ENTE_DB_USER=pguser
+      - ENTE_DB_PASSWORD=2DTjzzKrLl4xpB8n6rpcScG1YflL
     depends_on:
       postgres:
         condition: service_healthy
