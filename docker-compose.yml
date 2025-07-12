@@ -20,8 +20,6 @@ services:
     volumes:
       - ./museum.yaml:/museum.yaml:ro
       - ./data:/data:ro
-    networks:
-      - coolify
 
   # Resolve "localhost:3200" in the museum container to the minio container
   socat:
@@ -97,8 +95,4 @@ services:
 volumes:
   postgres-data:
   minio-data:
-
-networks:
-  coolify:
-    external: true
 
