@@ -17,8 +17,8 @@ services:
       - museum-logs:/var/logs
     networks:
       - ente-network
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
       interval: 30s
@@ -45,12 +45,12 @@ services:
       - ENTE_CAST_ORIGIN=${ENTE_CAST_ORIGIN}
     networks:
       - ente-network
-    ports:
-      - "3000:3000"  # Photos web app
-      - "3001:3001"  # Accounts
-      - "3002:3002"  # Albums (public sharing)
-      - "3003:3003"  # Auth (2FA app)
-      - "3004:3004"  # Cast (slideshow)
+    expose:
+      - "3000"  # Photos web app
+      - "3001"  # Accounts
+      - "3002"  # Albums (public sharing)
+      - "3003"  # Auth (2FA app)
+      - "3004"  # Cast (slideshow)
 
   postgres:
     image: postgres:15
@@ -104,9 +104,9 @@ services:
       - minio-data:/data
     networks:
       - ente-network
-    ports:
-      - "3200:3200"  # MinIO API
-      - "3201:3201"  # MinIO Console
+    expose:
+      - "3200"  # MinIO API
+      - "3201"  # MinIO Console
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3200/minio/health/live"]
       interval: 30s
