@@ -11,9 +11,9 @@ services:
       - SERVICE_FQDN_MUSEUM_8080
       - ENTE_DB_HOST=postgres
       - ENTE_DB_PORT=5432
-      - ENTE_DB_NAME=ente_db
-      - ENTE_DB_USER=pguser
-      - ENTE_DB_PASSWORD=2DTjzzKrLl4xpB8n6rpcScG1YflL
+      - ENTE_DB_NAME=${POSTGRES_DB:-ente_db}
+      - ENTE_DB_USER=${SERVICE_USER_POSTGRES:-pguser}
+      - ENTE_DB_PASSWORD=${SERVICE_PASSWORD_POSTGRES:-2DTjzzKrLl4xpB8n6rpcScG1YflL}
     depends_on:
       postgres:
         condition: service_healthy
