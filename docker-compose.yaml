@@ -71,23 +71,22 @@ services:
       retries: 3
     post_start:
       - command: |
-      sh -c '
-      #!/bin/sh
+          sh -c '
+          #!/bin/sh
 
-      while ! mc alias set h0 http://minio:3200 $${SERVICE_USER_MINIO} $${SERVICE_PASSWORD_MINIO} 2>/dev/null
-      do
-        echo "Waiting for minio..."
-        sleep 0.5
-      done
+          while ! mc alias set h0 http://minio:3200 $${SERVICE_USER_MINIO} $${SERVICE_PASSWORD_MINIO} 2>/dev/null; do
+            echo "Waiting for minio..."
+            sleep 0.5
+          done
 
-      cd /data
+          cd /data
 
-      echo "MinIO is ready. Creating buckets..."
-      mc mb -p b2-eu-cen
-      mc mb -p wasabi-eu-central-2-v3
-      mc mb -p scw-eu-fr-v3
-      echo "Buckets created and configured successfully"
-      '
+          echo "MinIO is ready. Creating buckets..."
+          mc mb -p b2-eu-cen
+          mc mb -p wasabi-eu-central-2-v3
+          mc mb -p scw-eu-fr-v3
+          echo "Buckets created and configured successfully"
+          '
 
 volumes:
   postgres-data:
