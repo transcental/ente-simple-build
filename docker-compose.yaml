@@ -22,10 +22,30 @@ services:
         condition: service_healthy
     volumes:
       - ./museum.yaml.template:/museum.yaml.template:ro
-      - ./init-config.sh:/init-config.sh:ro
       - ./data:/data:ro
-    entrypoint: ["./init-config.sh"]
-    command: ["./museum"]
+    command: |
+      sh -c '
+      # Verificar se envsubst está disponível
+      if ! command -v envsubst >/dev/null 2>&1; then
+          echo "envsubst não encontrado, instalando..."
+          apk add --no-cache gettext
+      fi
+      
+      # Gerar museum.yaml a partir do template
+      echo "Gerando museum.yaml a partir do template..."
+      envsubst < /museum.yaml.template > /museum.yaml
+      
+      # Verificar se o arquivo foi gerado
+      if [ -f "/museum.yaml" ]; then
+          echo "✅ museum.yaml gerado com sucesso"
+      else
+          echo "❌ Falha ao gerar museum.yaml"
+          exit 1
+      fi
+      
+      # Executar o comando original do container
+      exec ./museum
+      '
 
   # Resolve "localhost:3200" in the museum container to the minio container
   socat:
