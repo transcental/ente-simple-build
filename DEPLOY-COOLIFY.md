@@ -55,16 +55,16 @@ POSTGRES_DB=ente-db
 
 #### Passo 3: Configurar Custom Build Command
 
-No Coolify, na configuração do serviço, encontre o campo **"Custom Build Command"** e configure:
+**⚠️ ATENÇÃO: Problema de Timing das Variáveis**
 
-```bash
-envsubst < museum.yaml.template > museum.yaml
-```
+O Custom Build Command é executado **antes** das variáveis automáticas do Coolify estarem disponíveis. Por isso, **NÃO use** o Custom Build Command para o `envsubst`.
 
-**Importante:** 
-- Este comando é executado **antes** do `docker compose up`
-- O Coolify ainda fará o build/deploy do Docker Compose normalmente após executar este comando
-- Este comando apenas prepara o arquivo `museum.yaml` com as variáveis de ambiente substituídas
+**Solução Implementada:**
+- O arquivo `init-config.sh` é executado dentro do container quando ele inicia
+- Neste momento, todas as variáveis de ambiente do Coolify já estão disponíveis
+- O `envsubst` é executado corretamente dentro do container
+
+**NÃO configure Custom Build Command** - deixe em branco ou remova se já estiver configurado.
 
 #### Passo 4: Volumes Persistentes
 
