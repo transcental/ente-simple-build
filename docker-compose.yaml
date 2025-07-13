@@ -41,7 +41,7 @@ services:
       - SERVICE_FQDN_WEB_3000
       - SERVICE_FQDN_WEB_3002
       - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM}
-      - ENTE_ALBUMS_ORIGIN=$${SERVICE_FQDN_WEB_3002}
+      - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
 
   postgres:
     image: postgres:15
