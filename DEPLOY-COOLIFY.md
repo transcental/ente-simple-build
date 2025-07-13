@@ -5,7 +5,7 @@
 ### 1. Arquivos para Commit no GitHub
 
 Você pode fazer commit seguro dos seguintes arquivos:
-- `docker-compose.yml` (atualizado com variáveis de ambiente)
+- `docker-compose.yaml` (atualizado com variáveis de ambiente)
 - `museum.yaml.template` (template sem credenciais)
 - `DEPLOY-COOLIFY.md` (este arquivo)
 
@@ -53,13 +53,18 @@ POSTGRES_DB=ente-db
 - `SERVICE_FQDN_WEB_3002` - Gerada automaticamente
 - `SERVICE_FQDN_MINIO_3200` - Gerada automaticamente
 
-#### Passo 3: Configurar Build Command
+#### Passo 3: Configurar Custom Build Command
 
-No Coolify, configure o build command para gerar o `museum.yaml` a partir do template:
+No Coolify, na configuração do serviço, encontre o campo **"Custom Build Command"** e configure:
 
 ```bash
 envsubst < museum.yaml.template > museum.yaml
 ```
+
+**Importante:** 
+- Este comando é executado **antes** do `docker compose up`
+- O Coolify ainda fará o build/deploy do Docker Compose normalmente após executar este comando
+- Este comando apenas prepara o arquivo `museum.yaml` com as variáveis de ambiente substituídas
 
 #### Passo 4: Volumes Persistentes
 
@@ -102,7 +107,7 @@ Se encontrar problemas com variáveis não definidas, verifique:
 
 ```
 your-repo/
-├── docker-compose.yml          # ✅ Pode ser commitado
+├── docker-compose.yaml         # ✅ Pode ser commitado
 ├── museum.yaml.template        # ✅ Pode ser commitado
 ├── museum.yaml                 # ❌ NÃO commitar (gerado automaticamente)
 ├── .env                        # ❌ NÃO commitar
