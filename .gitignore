@@ -59,6 +59,10 @@ tmp/
 secrets/
 credentials/
 
+# Ente específico - arquivos com credenciais
+museum.yaml
+credentials.yaml
+
 # Backup files
 *.bak
 *.backup

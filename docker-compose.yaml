@@ -1,0 +1,94 @@
+# documentation: https://ente.io
+# slogan: Ente is a fully open source, End to End Encrypted alternative to Google Photos and Apple Photos
+# tags: ente,photos,backup,gallery,open,source,end-to-end,encryption
+# logo: https://github.com/ente-io/ente/raw/main/web/apps/photos/public/images/global/logo.png
+# port: 8080
+
+services:
+  museum:
+    image: ghcr.io/ente-io/server:latest
+    environment:
+      - SERVICE_FQDN_MUSEUM_8080
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - HASH_KEY=${HASH_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - POSTGRES_DB=${POSTGRES_DB:-ente-db}
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - MINIO_ROOT_USER=${SERVICE_USER_MINIO}
+      - MINIO_ROOT_PASSWORD=${SERVICE_PASSWORD_MINIO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./museum.yaml:/museum.yaml:ro
+      - ./data:/data:ro
+
+  # Resolve "localhost:3200" in the museum container to the minio container
+  socat:
+    image: alpine/socat:latest
+    network_mode: service:museum
+    depends_on: 
+      - museum
+    command: "TCP-LISTEN:3200,fork,reuseaddr TCP:minio:3200"
+
+  web:
+    image: ghcr.io/ente-io/web:latest
+    environment:
+      - SERVICE_FQDN_WEB_3000
+      - SERVICE_FQDN_WEB_3002
+      - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM}
+      - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - POSTGRES_DB=${POSTGRES_DB:-ente-db}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 40s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - SERVICE_FQDN_MINIO_3200
+      - MINIO_ROOT_USER=${SERVICE_USER_MINIO}
+      - MINIO_ROOT_PASSWORD=${SERVICE_PASSWORD_MINIO}
+    command: server /data --address ":3200" --console-address ":3201"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3200/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    post_start:
+      - command: |
+      sh -c '
+      #!/bin/sh
+
+      while ! mc alias set h0 http://minio:3200 $${SERVICE_USER_MINIO} $${SERVICE_PASSWORD_MINIO} 2>/dev/null
+      do
+        echo "Waiting for minio..."
+        sleep 0.5
+      done
+
+      cd /data
+
+      echo "MinIO is ready. Creating buckets..."
+      mc mb -p b2-eu-cen
+      mc mb -p wasabi-eu-central-2-v3
+      mc mb -p scw-eu-fr-v3
+      echo "Buckets created and configured successfully"
+      '
+
+volumes:
+  postgres-data:
+  minio-data:

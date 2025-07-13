@@ -1,0 +1,42 @@
+# Ente Museum Server Configuration
+# Template using variables consistent with docker-compose.yml
+
+# Encryption keys - to be set via environment variables
+key:
+  encryption: ${ENCRYPTION_KEY}
+  hash: ${HASH_KEY}
+
+# JWT configuration
+jwt:
+  secret: ${JWT_SECRET}
+
+# Database configuration
+db:
+  host: postgres
+  port: 5432
+  name: ${POSTGRES_DB}
+  user: ${SERVICE_USER_POSTGRES}
+  password: ${SERVICE_PASSWORD_POSTGRES}
+
+# S3 Configuration for local MinIO
+s3:
+  are_local_buckets: true
+  b2-eu-cen:
+    key: ${SERVICE_USER_MINIO}
+    secret: ${SERVICE_PASSWORD_MINIO}
+    endpoint: localhost:3200
+    region: eu-central-2
+    bucket: b2-eu-cen
+  wasabi-eu-central-2-v3:
+    key: ${SERVICE_USER_MINIO}
+    secret: ${SERVICE_PASSWORD_MINIO}
+    endpoint: localhost:3200
+    region: eu-central-2
+    bucket: wasabi-eu-central-2-v3
+    compliance: false
+  scw-eu-fr-v3:
+    key: ${SERVICE_USER_MINIO}
+    secret: ${SERVICE_PASSWORD_MINIO}
+    endpoint: localhost:3200
+    region: eu-central-2
+    bucket: scw-eu-fr-v3
