@@ -24,7 +24,7 @@ services:
       - ./museum.yaml.template:/museum.yaml.template:ro
       - ./init-config.sh:/init-config.sh:ro
       - ./data:/data:ro
-    entrypoint: ["/init-config.sh"]
+    entrypoint: ["./init-config.sh"]
     command: ["./museum"]
 
   # Resolve "localhost:3200" in the museum container to the minio container
