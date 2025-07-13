@@ -8,7 +8,7 @@ services:
   museum:
     image: ghcr.io/ente-io/server:latest
     environment:
-      - SERVICE_FQDN_MUSEUM_8080
+      - SERVICE_FQDN_MUSEUM_8080=${SERVICE_FQDN_MUSEUM_8080}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - HASH_KEY=${HASH_KEY}
       - JWT_SECRET=${JWT_SECRET}
@@ -36,8 +36,8 @@ services:
   web:
     image: ghcr.io/ente-io/web:latest
     environment:
-      - SERVICE_FQDN_WEB_3000
-      - SERVICE_FQDN_WEB_3002
+      - SERVICE_FQDN_WEB_3000=${SERVICE_FQDN_WEB_3000}
+      - SERVICE_FQDN_WEB_3002=${SERVICE_FQDN_WEB_3002}
       - ENTE_API_ORIGIN=${SERVICE_FQDN_MUSEUM_8080}
       - ENTE_ALBUMS_ORIGIN=${SERVICE_FQDN_WEB_3002}
 
@@ -59,7 +59,7 @@ services:
   minio:
     image: minio/minio:latest
     environment:
-      - SERVICE_FQDN_MINIO_3200
+      - SERVICE_FQDN_MINIO_3200=${SERVICE_FQDN_MINIO_3200}
       - MINIO_ROOT_USER=${SERVICE_USER_MINIO}
       - MINIO_ROOT_PASSWORD=${SERVICE_PASSWORD_MINIO}
     command: server /data --address ":3200" --console-address ":3201"
