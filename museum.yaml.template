@@ -40,3 +40,12 @@ s3:
     endpoint: localhost:3200
     region: eu-central-2
     bucket: scw-eu-fr-v3
+
+# Emails!
+smtp:
+  host: smtp.resend.com
+  port: 587
+  username: resend
+  password: ${RESEND_API_KEY}
+  email: ente@transcental.dev
+  sender-name: Ente
